@@ -4,6 +4,10 @@
     ViewData["Title"] = "Details";
 }
 
+@{
+    Dog dog = new Dog();
+}
+
 <h1>Details</h1>
 
 <div>
@@ -48,7 +52,35 @@
         </dd>
     </dl>
 </div>
+<br />
 <div>
-    @Html.ActionLink("Edit", "Edit", new { id=Model.Id }) |
+    <h4>Owners Dogs</h4>
+    <table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(Dogs => dog.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(Dogs => dog.Breed)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Dogs) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Breed)
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+</div>
+<div>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
     <a asp-action="Index">Back to List</a>
 </div>
