@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using DogGo.Repositories;
 using DogGo.Models;
+using System.Dynamic;
+using DogGo.Models.ViewModels;
 
 namespace DogGo.Controllers
 {
@@ -17,7 +19,7 @@ namespace DogGo.Controllers
         // GET: OwnerController
         public ActionResult Index()
         {
-            List<Owner> owners = _ownerRepository.getAllOwners();
+            List<Owner> owners = _ownerRepository.GetAllOwners();
 
             return View(owners);
         }
@@ -25,9 +27,11 @@ namespace DogGo.Controllers
         // GET: OwnerController/Details/5
         public ActionResult Details(int id)
         {
-            Owner owner = _ownerRepository.getOwnerById(id);
+            OwnerWithDogs ownerDogsModel = new OwnerWithDogs();
+            ownerDogsModel.Owner = _ownerRepository.GetOwnerById(id);
+            ownerDogsModel.Dogs = _ownerRepository.GetDogsByOwnerId(id);
 
-            return View(owner);
+            return View(ownerDogsModel);
         }
 
         // GET: OwnerController/Create
@@ -39,57 +43,72 @@ namespace DogGo.Controllers
         // POST: OwnerController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(Owner owner)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                _ownerRepository.AddOwner(owner);
+
+                return RedirectToAction("Index");
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                return View(owner);
             }
         }
 
         // GET: OwnerController/Edit/5
         public ActionResult Edit(int id)
         {
-            return View();
+            Owner owner = _ownerRepository.GetOwnerById(id);
+
+            if (owner == null)
+            {
+                return NotFound();
+            }
+
+            return View(owner);
         }
 
         // POST: OwnerController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(int id, Owner owner)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                _ownerRepository.UpdateOwner(owner);
+
+                return RedirectToAction("Index");
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                return View(owner);
             }
         }
 
         // GET: OwnerController/Delete/5
         public ActionResult Delete(int id)
         {
-            return View();
+            Owner owner = _ownerRepository.GetOwnerById(id);
+
+            return View(owner);
         }
 
         // POST: OwnerController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public ActionResult Delete(int id, Owner owner)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                _ownerRepository.DeleteOwner(id);
+
+                return RedirectToAction("Index");
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                return View(owner);
             }
         }
     }
