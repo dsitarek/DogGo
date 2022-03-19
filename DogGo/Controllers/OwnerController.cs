@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using DogGo.Repositories;
 using DogGo.Models;
-using System.Dynamic;
 using DogGo.Models.ViewModels;
 
 namespace DogGo.Controllers
@@ -73,7 +72,7 @@ namespace DogGo.Controllers
         // POST: OwnerController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, Owner owner)
+        public ActionResult Edit(Owner owner)
         {
             try
             {

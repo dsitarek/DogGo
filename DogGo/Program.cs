@@ -6,6 +6,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddTransient<IWalkerRepository, WalkerRepository>();
 builder.Services.AddTransient<IOwnerRepository, OwnerRepository>();
+builder.Services.AddTransient<IDogRepository, DogRepository>();
+builder.Services.AddControllers(
+    options => options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
