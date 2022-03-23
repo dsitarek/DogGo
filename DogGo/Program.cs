@@ -5,8 +5,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddTransient<IWalkerRepository, WalkerRepository>();
+builder.Services.AddTransient<IWalkRepository, WalkRepository>();
 builder.Services.AddTransient<IOwnerRepository, OwnerRepository>();
 builder.Services.AddTransient<IDogRepository, DogRepository>();
+builder.Services.AddTransient<INeighborhoodRepository, NeighborhoodRepository>();
 builder.Services.AddControllers(
     options => options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true);
 var app = builder.Build();

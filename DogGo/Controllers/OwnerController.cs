@@ -8,17 +8,28 @@ namespace DogGo.Controllers
 {
     public class OwnerController : Controller
     {
-        private readonly IOwnerRepository _ownerRepository;
+        private readonly IOwnerRepository _ownerRepo;
+        private readonly IDogRepository _dogRepo;
+        private readonly IWalkerRepository _walkerRepo;
+        private readonly INeighborhoodRepository _neighborhoodRepo;
 
-        public OwnerController(IOwnerRepository ownerRepo)
+
+        public OwnerController(
+            IOwnerRepository ownerRepository,
+            IDogRepository dogRepository,
+            IWalkerRepository walkerRepository,
+            INeighborhoodRepository neighborhoodRepository)
         {
-            _ownerRepository = ownerRepo;
+            _ownerRepo = ownerRepository;
+            _dogRepo = dogRepository;
+            _walkerRepo = walkerRepository;
+            _neighborhoodRepo = neighborhoodRepository;
         }
 
         // GET: OwnerController
         public ActionResult Index()
         {
-            List<Owner> owners = _ownerRepository.GetAllOwners();
+            List<Owner> owners = _ownerRepo.GetAllOwners();
 
             return View(owners);
         }
@@ -26,17 +37,32 @@ namespace DogGo.Controllers
         // GET: OwnerController/Details/5
         public ActionResult Details(int id)
         {
-            OwnerWithDogs ownerDogsModel = new OwnerWithDogs();
-            ownerDogsModel.Owner = _ownerRepository.GetOwnerById(id);
-            ownerDogsModel.Dogs = _ownerRepository.GetDogsByOwnerId(id);
+            Owner owner = _ownerRepo.GetOwnerById(id);
+            List<Dog> dogs = _dogRepo.GetDogsByOwnerId(owner.Id);
+            List<Walker> walkers = _walkerRepo.GetWalkersInNeighborhood(owner.NeighborhoodId);
 
-            return View(ownerDogsModel);
+            ProfileViewModel vm = new ProfileViewModel()
+            {
+                Owner = owner,
+                Dogs = dogs,
+                Walkers = walkers
+            };
+
+            return View(vm);
         }
 
         // GET: OwnerController/Create
         public ActionResult Create()
         {
-            return View();
+            List<Neighborhood> neighborhoods = _neighborhoodRepo.GetAll();
+
+            OwnerFormViewModel vm = new OwnerFormViewModel()
+            {
+                Owner = new Owner(),
+                Neighborhoods = neighborhoods
+            };
+
+            return View(vm);
         }
 
         // POST: OwnerController/Create
@@ -46,7 +72,7 @@ namespace DogGo.Controllers
         {
             try
             {
-                _ownerRepository.AddOwner(owner);
+                _ownerRepo.AddOwner(owner);
 
                 return RedirectToAction("Index");
             }
@@ -59,14 +85,15 @@ namespace DogGo.Controllers
         // GET: OwnerController/Edit/5
         public ActionResult Edit(int id)
         {
-            Owner owner = _ownerRepository.GetOwnerById(id);
+            List<Neighborhood> neighborhoods = _neighborhoodRepo.GetAll();
 
-            if (owner == null)
+            OwnerFormViewModel vm = new OwnerFormViewModel()
             {
-                return NotFound();
-            }
+                Owner = _ownerRepo.GetOwnerById(id),
+                Neighborhoods = neighborhoods
+            };
 
-            return View(owner);
+            return View(vm);
         }
 
         // POST: OwnerController/Edit/5
@@ -76,7 +103,7 @@ namespace DogGo.Controllers
         {
             try
             {
-                _ownerRepository.UpdateOwner(owner);
+                _ownerRepo.UpdateOwner(owner);
 
                 return RedirectToAction("Index");
             }
@@ -89,7 +116,7 @@ namespace DogGo.Controllers
         // GET: OwnerController/Delete/5
         public ActionResult Delete(int id)
         {
-            Owner owner = _ownerRepository.GetOwnerById(id);
+            Owner owner = _ownerRepo.GetOwnerById(id);
 
             return View(owner);
         }
@@ -101,7 +128,7 @@ namespace DogGo.Controllers
         {
             try
             {
-                _ownerRepository.DeleteOwner(id);
+                _ownerRepo.DeleteOwner(id);
 
                 return RedirectToAction("Index");
             }
